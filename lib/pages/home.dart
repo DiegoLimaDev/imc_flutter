@@ -28,24 +28,26 @@ class _HomePageState extends State<HomePage> {
     imcList = await imcRepo.getImcs();
   }
 
-  Widget checkImcValue(double imc) {
-    return Container(
-        child: imc < 16
-            ? const Text('Magreza grave')
-            : 16 < imc && imc < 17
-                ? const Text('Magreza moderada')
-                : 17 < imc && imc < 18.5
-                    ? const Text('Magreza leve')
-                    : 18.5 < imc && imc < 25
-                        ? const Text('Saudável')
-                        : 25 < imc && imc < 30
-                            ? const Text('Sobrepeso')
-                            : 30 < imc && imc < 35
-                                ? const Text('Obesidade grau I')
-                                : 35 < imc && imc < 40
-                                    ? const Text('Obresidade grau II (severa)')
-                                    : const Text(
-                                        'Obesidade grau III (mórbida)'));
+  String checkImcValue(double imc) {
+    if (imc < 16) return 'Magreza grave';
+    if (16 < imc && imc < 17) return 'Magreza moderada';
+    if (17 < imc && imc < 18.5) return 'Magreza leve';
+    if (18.5 < imc && imc < 25) return 'Saudável';
+    if (25 < imc && imc < 30) return 'Sobrepreso';
+    if (30 < imc && imc < 35) return 'Obesidade grau I';
+    if (35 < imc && imc < 40) return 'Obresidade grau II (severa)';
+    return 'Obesidade grau III (mórbida)';
+  }
+
+  MaterialColor checkImcForColor(double imc) {
+    if (imc < 16) return Colors.red;
+    if (16 < imc && imc < 17) return Colors.pink;
+    if (17 < imc && imc < 18.5) return Colors.pink;
+    if (18.5 < imc && imc < 25) return Colors.green;
+    if (25 < imc && imc < 30) return Colors.pink;
+    if (30 < imc && imc < 35) return Colors.red;
+    if (35 < imc && imc < 40) return Colors.red;
+    return Colors.red;
   }
 
   @override
@@ -116,7 +118,10 @@ class _HomePageState extends State<HomePage> {
                     style: const TextStyle(
                         fontSize: 20, fontWeight: FontWeight.w500),
                   ),
-                  subtitle: checkImcValue(imc),
+                  subtitle: Text(
+                    checkImcValue(imc),
+                    style: TextStyle(color: checkImcForColor(imc)),
+                  ),
                 );
               }).toList()),
             )
