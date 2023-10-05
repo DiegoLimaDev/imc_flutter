@@ -17,11 +17,16 @@ class _HomePageState extends State<HomePage> {
   List<double> imcList = <double>[];
 
   Future<void> addImc(String h, String w) async {
-    var height = double.tryParse(h);
-    var weight = double.tryParse(w);
-    await imcRepo.addImc(ImcModel(height!, weight!));
-    imcList = await imcRepo.getImcs();
-    setState(() {});
+    try {
+      var height = double.parse(h);
+      var weight = double.parse(w);
+      await imcRepo.addImc(ImcModel(height, weight));
+      imcList = await imcRepo.getImcs();
+      setState(() {});
+    } catch (e) {
+      myDialog();
+      return;
+    }
   }
 
   Future<void> getImcs() async {
@@ -50,6 +55,27 @@ class _HomePageState extends State<HomePage> {
     return Colors.red;
   }
 
+  void _close() {
+    Navigator.pop(context);
+  }
+
+  Future<dynamic> myDialog() {
+    return showDialog(
+        context: context,
+        builder: (_) {
+          return AlertDialog(
+              title: const Text('Erro'),
+              content: const Text('Favor informar valores válidos'),
+              actions: [
+                InkWell(
+                    onTap: () {
+                      _close();
+                    },
+                    child: const Text('Fechar'))
+              ]);
+        });
+  }
+
   @override
   void initState() {
     super.initState();
@@ -73,9 +99,6 @@ class _HomePageState extends State<HomePage> {
             TextField(
               controller: heightController,
               keyboardType: TextInputType.number,
-              // inputFormatters: <TextInputFormatter>[
-              //   FilteringTextInputFormatter.allow(r'/^[0-9]+.[0-9]+$'),
-              // ],
               decoration: const InputDecoration(
                   hintText: 'Digite sua altura',
                   prefixIcon: Icon(Icons.keyboard_alt_outlined)),
@@ -86,9 +109,6 @@ class _HomePageState extends State<HomePage> {
             TextField(
               controller: weightController,
               keyboardType: TextInputType.number,
-              inputFormatters: <TextInputFormatter>[
-                FilteringTextInputFormatter.digitsOnly
-              ],
               decoration: const InputDecoration(
                   hintText: 'Digite seu peso',
                   prefixIcon: Icon(Icons.keyboard_alt_outlined)),
