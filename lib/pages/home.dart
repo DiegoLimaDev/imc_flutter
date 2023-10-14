@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:imc_flutter/classes/imc_model.dart';
@@ -14,14 +16,16 @@ class _HomePageState extends State<HomePage> {
   TextEditingController heightController = TextEditingController();
   TextEditingController weightController = TextEditingController();
   ImcListRepo imcRepo = ImcListRepo();
-  List<double> imcList = <double>[];
+  List<String> imcList = <String>[];
 
   Future<void> addImc(String h, String w) async {
     try {
       var height = double.parse(h);
       var weight = double.parse(w);
-      await imcRepo.addImc(ImcModel(height, weight));
-      imcList = await imcRepo.getImcs();
+      var calculate = (weight / (pow(height, 2)));
+      imcList.add(calculate.toString());
+      await imcRepo.saveImcList(imcList);
+      imcList = await imcRepo.getImcList();
       setState(() {});
     } catch (e) {
       myDialog();
@@ -30,7 +34,8 @@ class _HomePageState extends State<HomePage> {
   }
 
   Future<void> getImcs() async {
-    imcList = await imcRepo.getImcs();
+    imcList = await imcRepo.getImcList();
+    setState(() {});
   }
 
   String checkImcValue(double imc) {
@@ -118,6 +123,7 @@ class _HomePageState extends State<HomePage> {
             ),
             TextButton(
               onPressed: () async {
+                print(imcList);
                 addImc(heightController.text, weightController.text);
                 heightController.text = '';
                 weightController.text = '';
@@ -134,13 +140,14 @@ class _HomePageState extends State<HomePage> {
                   children: imcList.map((imc) {
                 return ListTile(
                   title: Text(
-                    imc.toStringAsFixed(2),
+                    imc,
                     style: const TextStyle(
                         fontSize: 20, fontWeight: FontWeight.w500),
                   ),
                   subtitle: Text(
-                    checkImcValue(imc),
-                    style: TextStyle(color: checkImcForColor(imc)),
+                    checkImcValue(double.parse(imc)),
+                    style:
+                        TextStyle(color: checkImcForColor(double.parse(imc))),
                   ),
                 );
               }).toList()),
